@@ -27,9 +27,12 @@ Create a CSV file with test cases:
 
 ```csv
 entry_ref,sense_id,word,pos
-aaron_n2,12884176,aaron,noun
-aaronical_adj,10285653,aaronical,adjective
-aaronite_n,12148161,aaronite,noun
+insinuate_v,353637,insinuate,verb
+nough_adv,34306144,'nough,adverb
+know_v,40025845,know,verb
+anatheme_n1,4073595,anatheme,noun
+dough-baked_adj,6185578,dough-baked,adjective
+self-slaughter_n,23517073,self-slaughter,noun
 ```
 
 Save as `test_cases/my_test.csv`
@@ -46,16 +49,19 @@ python benchmark_pipeline.py \
 
 **Output:**
 ```
-[1/3] 12884176: 0/10 matching
-[2/3] 10285653: 10/10 matching
-[3/3] 12148161: 9/8 matching
+[1/6] 353637: 8/10 matching
+[2/6] 34306144: 0/10 matching
+[3/6] 40025845: 10/10 matching
+[4/6] 4073595: 5/10 matching
+[5/6] 6185578: 7/10 matching
+[6/6] 23517073: 9/10 matching
 
-✓ CSV report: results/base_pipeline/oed-quotations_20260113.csv
-✓ Excel report: results/base_pipeline/oed-quotations_20260113.xlsx
-✓ Summary: results/base_pipeline/oed-quotations_20260113_summary.txt
+✓ CSV report: results/base_pipeline/oed-quotations_20260116.csv
+✓ Excel report: results/base_pipeline/oed-quotations_20260116.xlsx
+✓ Summary: results/base_pipeline/oed-quotations_20260116_summary.txt
 
-Total matching quotations: 19
-Match rate: 67.9%
+Total matching quotations: 39
+Match rate: 65.0%
 ```
 
 ### Step 3: Run Your Second Pipeline
@@ -70,14 +76,19 @@ python benchmark_pipeline.py \
 
 **Output:**
 ```
-[1/3] 12884176: 10/10 matching
-[2/3] 10285653: 10/10 matching
-[3/3] 12148161: 10/10 matching
+[1/6] 353637: 10/10 matching
+[2/6] 34306144: 2/10 matching
+[3/6] 40025845: 10/10 matching
+[4/6] 4073595: 8/10 matching
+[5/6] 6185578: 10/10 matching
+[6/6] 23517073: 10/10 matching
 
-✓ CSV report: results/hybrid_pipeline/hybrid_20260113.csv
+✓ CSV report: results/hybrid_pipeline/hybrid_20260116.csv
+✓ Excel report: results/hybrid_pipeline/hybrid_20260116.xlsx
+✓ Summary: results/hybrid_pipeline/hybrid_20260116_summary.txt
 
-Total matching quotations: 30
-Match rate: 100.0%
+Total matching quotations: 50
+Match rate: 83.3%
 ```
 
 ### Step 4: Compare Results
@@ -92,12 +103,13 @@ python compare_results.py \
 ```
 OVERALL STATISTICS
       Pipeline  Total Quotations  Matching Quotations  Match Rate (%)
-oed-quotations                28                   19           67.9%
-        hybrid                30                   30          100.0%
+oed-quotations                60                   39           65.0%
+        hybrid                60                   50           83.3%
 
 WIN/LOSS SUMMARY
 oed-quotations: 0 cases where it has the most matches
-hybrid: 2 cases where it has the most matches
+hybrid: 4 cases where it has the most matches
+ties: 2 cases
 
 ✓ Hybrid pipeline performs better!
 ```

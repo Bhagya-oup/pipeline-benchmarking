@@ -48,12 +48,14 @@ Create a CSV file with your test cases:
 
 ```csv
 entry_ref,sense_id,word,pos
-fine_n,fine_n01_1,fine,noun
-fair_n,fair_n02_3,fair,noun
-sausage_n,sausage_n01_1,sausage,noun
+insinuate_v,353637,insinuate,verb
+know_v,40025845,know,verb
+anatheme_n1,4073595,anatheme,noun
+dough-baked_adj,6185578,dough-baked,adjective
+self-slaughter_n,23517073,self-slaughter,noun
 ```
 
-**Important**: Use full POS names (`noun`, `verb`, `adjective`) not codes (`n`, `v`, `adj`).
+**Important**: Use full POS names (`noun`, `verb`, `adjective`, `adverb`) not codes (`n`, `v`, `adj`).
 
 Save to `test_cases/my_test_cases.csv`
 
@@ -143,9 +145,11 @@ python compare_results.py results/pipeline_a/*.csv results/pipeline_b/*.csv
 ### CSV Format
 ```csv
 entry_ref,sense_id,word,pos
-fine_n,fine_n01_1,fine,noun
-fair_n,fair_n02_3,fair,noun
-flowery_adj1,flowery_adj_4165862,flowery,adjective
+insinuate_v,353637,insinuate,verb
+nough_adv,34306144,'nough,adverb
+know_v,40025845,know,verb
+anatheme_n1,4073595,anatheme,noun
+dough-baked_adj,6185578,dough-baked,adjective
 ```
 
 **Important**: Use **full POS names** (`noun`, `verb`, `adjective`, `adverb`, etc.), not short codes (`n`, `v`, `adj`), as this matches the Hero Quotations API format.
@@ -154,24 +158,31 @@ flowery_adj1,flowery_adj_4165862,flowery,adjective
 ```json
 [
   {
-    "entry_ref": "fine_n",
-    "sense_id": "fine_n01_1",
-    "word": "fine",
+    "entry_ref": "insinuate_v",
+    "sense_id": "353637",
+    "word": "insinuate",
+    "pos": "verb"
+  },
+  {
+    "entry_ref": "anatheme_n1",
+    "sense_id": "4073595",
+    "word": "anatheme",
     "pos": "noun"
   },
   {
-    "entry_ref": "fair_n",
-    "sense_id": "fair_n02_3",
-    "word": "fair",
-    "pos": "noun"
+    "entry_ref": "dough-baked_adj",
+    "sense_id": "6185578",
+    "word": "dough-baked",
+    "pos": "adjective"
   }
 ]
 ```
 
 ### TXT Format (space-separated)
 ```
-fine_n fine_n01_1 fine noun
-fair_n fair_n02_3 fair noun
+insinuate_v 353637 insinuate verb
+anatheme_n1 4073595 anatheme noun
+dough-baked_adj 6185578 dough-baked adjective
 ```
 
 ## Output Reports
@@ -180,8 +191,9 @@ fair_n fair_n02_3 fair noun
 Simple table with all results:
 ```
 entry_ref,sense_id,word,pos,total_quotations,matching_quotations,response_time,error
-fine_n,fine_n01_1,fine,noun,10,8,45.2,
-fair_n,fair_n02_3,fair,noun,10,10,42.8,
+insinuate_v,353637,insinuate,verb,10,8,45.2,
+know_v,40025845,know,verb,10,10,42.8,
+anatheme_n1,4073595,anatheme,noun,10,7,48.1,
 ```
 
 ### 2. Excel Report (`pipeline_name_TIMESTAMP.xlsx`)
