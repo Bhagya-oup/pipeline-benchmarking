@@ -106,7 +106,7 @@ hybrid: 2 cases where it has the most matches
 
 ## Real-World Example: Testing 1000 Words
 
-### 1. Run Base Pipeline (20 minutes)
+### 1. Run Base Pipeline (~1.5 hours)
 
 ```bash
 python benchmark_pipeline.py \
@@ -116,7 +116,9 @@ python benchmark_pipeline.py \
     --workers 8
 ```
 
-### 2. Run Hybrid Pipeline (20 minutes)
+**Note**: Each test case takes ~42-52 seconds. With 8 workers, 1000 cases take approximately 1.5 hours.
+
+### 2. Run Hybrid Pipeline (~1.5 hours)
 
 ```bash
 python benchmark_pipeline.py \
@@ -126,7 +128,7 @@ python benchmark_pipeline.py \
     --workers 8
 ```
 
-### 3. Run Third Pipeline (optional, 20 minutes)
+### 3. Run Third Pipeline (optional, ~1.5 hours)
 
 ```bash
 python benchmark_pipeline.py \

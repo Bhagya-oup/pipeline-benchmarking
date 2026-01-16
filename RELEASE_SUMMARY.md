@@ -147,7 +147,7 @@ First stable release of the pipeline benchmarking framework for Deepset Cloud.
 
 ## Features
 
-✅ **Parallel Execution**: 4-8 workers, ~20-30 minutes for 1000 test cases
+✅ **Parallel Execution**: 4-8 workers, ~1.5 hours for 1000 test cases (with 8 workers)
 ✅ **Checkpoint Resumability**: Never lose progress
 ✅ **Comprehensive Reports**: CSV, Excel (multi-sheet), text summary
 ✅ **Error Handling**: Automatic retry with exponential backoff
@@ -254,7 +254,8 @@ python compare_pipelines.py \
 - **Total Lines of Code**: ~2,500 lines
 - **Core Modules**: 9 Python files
 - **Test Coverage**: Validated through real-world testing
-- **Performance**: 20-30 minutes for 1000 test cases (4 workers)
+- **Performance**: ~1.5 hours for 1000 test cases (8 workers), ~3 hours (4 workers)
+- **Per Test Case**: ~42-52 seconds average response time
 - **Reliability**: 89-93% correlation between test runs
 
 ## 🔗 Next Steps After Release

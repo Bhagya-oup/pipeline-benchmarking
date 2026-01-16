@@ -12,10 +12,10 @@ This tool compares two Deepset Cloud pipelines (e.g., "new" vs "old") across mul
 
 ## Features
 
-✅ **Parallel Execution**: Run 4-8 workers for optimal speed (~20-30 minutes for 1000 test cases)
+✅ **Parallel Execution**: Run 4-8 workers for optimal speed (~1.5 hours for 1000 test cases with 8 workers)
 ✅ **Checkpoint-based Resumability**: Never lose progress if interrupted
 ✅ **Comprehensive Reporting**: CSV, Excel (multi-sheet), and text summary
-✅ **Real API Testing**: Tests against actual Solr, Sketch Engine, and Deepset Cloud APIs
+✅ **Real API Testing**: Tests against actual Deepset Cloud pipeline APIs (~42-52 seconds per test case)
 ✅ **Error Handling**: Automatic retry with exponential backoff
 ✅ **Rate Limiting**: Prevents exceeding API quotas
 
@@ -212,15 +212,18 @@ pipeline_benchmarking/
 ## Performance
 
 **For 1000 Test Cases:**
-- **4 workers**: ~25-30 minutes
-- **8 workers**: ~15-20 minutes (if API limits allow)
+- **8 workers**: ~1.5 hours (90 minutes)
+- **4 workers**: ~3 hours (180 minutes)
 
-**API Calls per Test Case:**
-- Solr OED (sense definition): ~0.3s
-- Hero Quotations API: ~1.0s
-- Deepset (new pipeline): ~2.0s
-- Deepset (old pipeline): ~2.0s
-- **Total: ~5.3s per case**
+**For 100 Test Cases:**
+- **8 workers**: ~9 minutes
+- **4 workers**: ~18 minutes
+
+**Actual Response Time per Test Case:**
+- Average: **~42-52 seconds per case** (based on real test data)
+- This is for running a single pipeline on one test case
+- Each test case processes 10 quotations with LLM analysis
+- If comparing two pipelines, multiply time estimates by 2
 
 ## Troubleshooting
 

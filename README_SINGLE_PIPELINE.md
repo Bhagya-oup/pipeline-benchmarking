@@ -91,7 +91,7 @@ python benchmark_pipeline.py \
     --workers 8
 ```
 
-**Expected time:** ~15-20 minutes with 8 workers
+**Expected time:** ~1.5 hours with 8 workers (~42-52 seconds per test case)
 
 ### Resume interrupted run
 
