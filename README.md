@@ -32,7 +32,7 @@ pip install -r requirements.txt
 ```bash
 HERO_API_KEY=your_hero_api_key
 DEEPSET_API_KEY=your_deepset_api_key
-DEEPSET_WORKSPACE_URL=https://your-workspace.deepset.cloud
+DEEPSET_WORKSPACE=your_deepset_workspace
 ```
 
 **Note**: The tool now uses the **Hero Quotations API** (matching your production pipeline), which expects full POS names like `"noun"`, `"verb"`, `"adjective"` in your test data CSV.
