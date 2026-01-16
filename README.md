@@ -33,13 +33,14 @@ pip install -r requirements.txt
 # Required
 DEEPSET_API_KEY=your_deepset_api_key_here
 DEEPSET_WORKSPACE=your_workspace_name
+
 # Optional (if your pipelines need them)
 HERO_API_KEY=your_hero_api_key_if_needed
 ```
 
 **Note**:
-- `DEEPSET_WORKSPACE_URL` should be the full API URL, not just the workspace name
-- Example: `https://api.cloud.deepset.ai/api/v1/workspaces/OL-Hero-LM`
+- `DEEPSET_WORKSPACE` should be just the workspace name (e.g., "OL-Hero-LM")
+- The tool automatically constructs the full API URL
 - Solr credentials are NOT needed for pipeline testing
 
 **Note**: The tool now uses the **Hero Quotations API** (matching your production pipeline), which expects full POS names like `"noun"`, `"verb"`, `"adjective"` in your test data CSV.

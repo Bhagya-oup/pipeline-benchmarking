@@ -79,14 +79,14 @@ Create a template for environment variables:
 ```bash
 # Required - Deepset Cloud API Configuration
 DEEPSET_API_KEY=your_deepset_api_key_here
-DEEPSET_WORKSPACE_URL=https://api.cloud.deepset.ai/api/v1/workspaces/YOUR_WORKSPACE_NAME
+DEEPSET_WORKSPACE=your_workspace_name
 
 # Optional - Additional API Keys (if your pipelines need them)
 HERO_API_KEY=your_hero_api_key_if_needed
 
 # Note:
-# - DEEPSET_WORKSPACE_URL should be the full API URL, not just the workspace name
-# - Example: https://api.cloud.deepset.ai/api/v1/workspaces/OL-Hero-LM
+# - DEEPSET_WORKSPACE should be just the workspace name (e.g., "OL-Hero-LM")
+# - The tool automatically constructs the full API URL
 ```
 
 ### 2. `README.md`
