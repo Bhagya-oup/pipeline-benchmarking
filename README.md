@@ -32,8 +32,7 @@ pip install -r requirements.txt
 ```bash
 # Required
 DEEPSET_API_KEY=your_deepset_api_key_here
-DEEPSET_WORKSPACE_URL=https://api.cloud.deepset.ai/api/v1/workspaces/YOUR_WORKSPACE_NAME
-
+DEEPSET_WORKSPACE=your_workspace_name
 # Optional (if your pipelines need them)
 HERO_API_KEY=your_hero_api_key_if_needed
 ```
