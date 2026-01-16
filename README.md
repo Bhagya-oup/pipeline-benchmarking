@@ -1,14 +1,14 @@
 # Pipeline Benchmarking Tool
 
-Automated comparison framework for Deepset pipelines with parallel execution, checkpoint-based resumability, and comprehensive reporting.
+Automated benchmarking framework for Deepset Cloud pipelines with parallel execution, checkpoint-based resumability, and comprehensive reporting.
 
 ## Overview
 
-This tool compares two Deepset Cloud pipelines (e.g., "new" vs "old") across multiple test cases, measuring:
-- **Retrieval accuracy**: Number of matches found
+This tool benchmarks a Deepset Cloud pipeline across multiple test cases, measuring:
+- **Retrieval accuracy**: Number of matching quotations per sense
 - **Performance**: Response time per query
-- **Success rate**: How often each pipeline succeeds
-- **Head-to-head comparison**: Which pipeline performs better
+- **Success rate**: How often the pipeline succeeds
+- **Match distribution**: Perfect matches, partial matches, zero matches
 
 ## Features
 
@@ -57,73 +57,85 @@ sausage_n,sausage_n01_1,sausage,noun
 
 Save to `test_cases/my_test_cases.csv`
 
-### 2. Run Comparison
+### 2. Run Benchmark
 
 ```bash
 cd pipeline_benchmarking
 
-python compare_pipelines.py \
+python benchmark_pipeline.py \
+  --pipeline your_pipeline_name \
   --test-data test_cases/my_test_cases.csv \
-  --new-pipeline unified_simple \
-  --old-pipeline sense_retrieval_no_custom \
-  --output results/comparison_2026-01-13 \
-  --workers 4
+  --output results/my_pipeline_test \
+  --workers 8
 ```
 
 ### 3. View Results
 
 ```bash
 # Text summary
-cat results/comparison_2026-01-13/summary_TIMESTAMP.txt
+cat results/my_pipeline_test/your_pipeline_name_TIMESTAMP_summary.txt
+
+# CSV report
+open results/my_pipeline_test/your_pipeline_name_TIMESTAMP.csv
 
 # Excel report (multi-sheet analysis)
-open results/comparison_2026-01-13/comparison_TIMESTAMP.xlsx
+open results/my_pipeline_test/your_pipeline_name_TIMESTAMP.xlsx
 ```
 
 ## Usage
 
-### Basic Comparison
+### Basic Benchmark
 ```bash
-python compare_pipelines.py \
-  --test-data test_cases/data.csv \
-  --new-pipeline unified_simple \
-  --old-pipeline sense_retrieval_no_custom
+python benchmark_pipeline.py \
+  --pipeline oed-quotations \
+  --test-data test_cases/data.csv
 ```
 
 ### Resume from Checkpoint
 ```bash
-python compare_pipelines.py \
+python benchmark_pipeline.py \
+  --pipeline oed-quotations \
   --test-data test_cases/data.csv \
-  --new-pipeline unified_simple \
-  --old-pipeline sense_retrieval_no_custom \
   --resume
 ```
 
 ### Clear Checkpoint and Start Fresh
 ```bash
-python compare_pipelines.py \
+python benchmark_pipeline.py \
+  --pipeline oed-quotations \
   --test-data test_cases/data.csv \
-  --new-pipeline unified_simple \
-  --old-pipeline sense_retrieval_no_custom \
   --clear-checkpoint
 ```
 
 ### More Workers (Faster)
 ```bash
-python compare_pipelines.py \
+python benchmark_pipeline.py \
+  --pipeline oed-quotations \
   --test-data test_cases/data.csv \
-  --new-pipeline unified_simple \
-  --old-pipeline sense_retrieval_no_custom \
   --workers 8
 ```
 
 ### Custom Output Directory
 ```bash
-python compare_pipelines.py \
+python benchmark_pipeline.py \
+  --pipeline oed-quotations \
   --test-data test_cases/data.csv \
-  --new-pipeline unified_simple \
-  --old-pipeline sense_retrieval_no_custom \
   --output results/experiment_001
+```
+
+### Compare Multiple Pipeline Runs
+
+To compare different pipelines, run each separately and use the comparison script:
+
+```bash
+# Test pipeline A
+python benchmark_pipeline.py --pipeline pipeline_a --test-data test_cases/data.csv --output results/pipeline_a
+
+# Test pipeline B
+python benchmark_pipeline.py --pipeline pipeline_b --test-data test_cases/data.csv --output results/pipeline_b
+
+# Compare results
+python compare_results.py results/pipeline_a/*.csv results/pipeline_b/*.csv
 ```
 
 ## Test Data Formats
@@ -164,49 +176,52 @@ fair_n fair_n02_3 fair noun
 
 ## Output Reports
 
-### 1. CSV Report (`comparison_TIMESTAMP.csv`)
+### 1. CSV Report (`pipeline_name_TIMESTAMP.csv`)
 Simple table with all results:
 ```
-entry_ref,sense_id,word,pos,new_matches,old_matches,improvement,winner
-fine_n,fine_n01_1,fine,n,15,8,+87.5%,new
+entry_ref,sense_id,word,pos,total_quotations,matching_quotations,response_time,error
+fine_n,fine_n01_1,fine,noun,10,8,45.2,
+fair_n,fair_n02_3,fair,noun,10,10,42.8,
 ```
 
-### 2. Excel Report (`comparison_TIMESTAMP.xlsx`)
+### 2. Excel Report (`pipeline_name_TIMESTAMP.xlsx`)
 Multi-sheet workbook:
-- **Summary**: Overall statistics
-- **Detailed Results**: All test cases
-- **Top Improvements**: Biggest wins for new pipeline
-- **Failures**: Cases where both pipelines failed
-- **New Pipeline Wins**: All cases where new pipeline outperformed
+- **Results**: Full detailed results for all test cases
+- **Summary**: Overall statistics (match rate, success rate, etc.)
+- **Top Matches**: Cases with highest match counts
+- **Zero Matches**: Cases that need investigation
+- **Errors**: Failed test cases with error messages
 
-### 3. Text Summary (`summary_TIMESTAMP.txt`)
+### 3. Text Summary (`pipeline_name_TIMESTAMP_summary.txt`)
 Human-readable summary:
 ```
+Pipeline: oed-quotations
 Total Test Cases: 1000
-New Pipeline: 847/1000 (84.7%) success
-Old Pipeline: 612/1000 (61.2%) success
-New Wins: 312
-Old Wins: 89
-Ties: 599
+Success Rate: 984/1000 (98.4%)
+Total Matching Quotations: 6,547
+Average Matches per Case: 6.5
+Perfect Matches (10/10): 324 cases
+Zero Matches: 142 cases
 ```
 
 ## Architecture
 
 ```
 pipeline_benchmarking/
-├── compare_pipelines.py           # Main CLI
+├── benchmark_pipeline.py          # Main CLI for single pipeline testing
+├── compare_results.py             # Compare results from multiple runs
 ├── src/
 │   ├── config.py                  # Configuration dataclasses
 │   ├── test_case_loader.py        # CSV/JSON/TXT parsers
 │   ├── pipeline_executor.py       # Pipeline invocation
-│   ├── parallel_runner.py         # Multiprocessing engine
+│   ├── single_pipeline_runner.py  # Single pipeline execution engine
 │   ├── checkpoint_manager.py      # Resumability
-│   ├── metrics_calculator.py      # Comparison metrics
+│   ├── metrics_calculator.py      # Accuracy metrics
 │   └── report_generator.py        # CSV/Excel/text output
 ├── test_cases/                    # Your test data (gitignored)
 └── results/                       # Output reports (gitignored)
     ├── checkpoints/
-    └── comparison_TIMESTAMP.{csv,xlsx,txt}
+    └── pipeline_name_TIMESTAMP.{csv,xlsx,txt}
 ```
 
 ## Performance
@@ -221,9 +236,8 @@ pipeline_benchmarking/
 
 **Actual Response Time per Test Case:**
 - Average: **~42-52 seconds per case** (based on real test data)
-- This is for running a single pipeline on one test case
 - Each test case processes 10 quotations with LLM analysis
-- If comparing two pipelines, multiply time estimates by 2
+- Times include full pipeline processing (retrieval + reranking + LLM verification)
 
 ## Troubleshooting
 
@@ -284,30 +298,48 @@ Ensure you're in the `pipeline_benchmarking/` directory when running the tool.
 
 ## Examples
 
-### Compare On-the-Fly vs Pre-Indexed
+### Test Baseline Pipeline on 1000 Cases
 ```bash
-python compare_pipelines.py \
-  --test-data test_cases/rare_senses_1000.csv \
-  --new-pipeline unified_simple \
-  --old-pipeline sense_retrieval_no_custom \
-  --output results/onthefly_vs_preindexed
+python benchmark_pipeline.py \
+  --pipeline oed-quotations \
+  --test-data test_cases/1000_words.csv \
+  --output results/baseline_test \
+  --workers 8
 ```
 
-### Compare Different Top-K Values
-(Requires separate pipeline configurations in Deepset Cloud)
+### Test Hybrid Pipeline on Same Cases
 ```bash
-python compare_pipelines.py \
-  --test-data test_cases/test.csv \
-  --new-pipeline pipeline_topk_20 \
-  --old-pipeline pipeline_topk_50 \
-  --output results/topk_comparison
+python benchmark_pipeline.py \
+  --pipeline rare_senses_hybrid_cosine_similarity_and_BM25_plus_reranking \
+  --test-data test_cases/1000_words.csv \
+  --output results/hybrid_test \
+  --workers 8
+```
+
+### Compare Results from Both Runs
+```bash
+python compare_results.py \
+  results/baseline_test/*.csv \
+  results/hybrid_test/*.csv
+```
+
+### Progressive Testing (Start Small)
+```bash
+# Start with 10 cases to verify setup
+python benchmark_pipeline.py --pipeline your_pipeline --test-data test_cases/10_cases.csv --workers 4
+
+# Scale to 100 cases
+python benchmark_pipeline.py --pipeline your_pipeline --test-data test_cases/100_cases.csv --workers 8
+
+# Full 1000 case test
+python benchmark_pipeline.py --pipeline your_pipeline --test-data test_cases/1000_cases.csv --workers 8
 ```
 
 ## Contributing
 
-This is a standalone tool within the Rare Senses project. To add features:
+This is a standalone tool for benchmarking Deepset Cloud pipelines. To add features:
 1. Modify modules in `src/`
-2. Update CLI in `compare_pipelines.py`
+2. Update CLI in `benchmark_pipeline.py` or `compare_results.py`
 3. Update this README
 
 ## License
