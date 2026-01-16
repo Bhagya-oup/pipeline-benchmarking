@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# User data and credentials
+.env
+test_cases/*.csv
+test_cases/*.json
+test_cases/*.txt
+!test_cases/.gitkeep
+!test_cases/sample_test_cases.csv
+
+# Results
+results/**/*
+!results/.gitkeep
+!results/checkpoints/.gitkeep
+!results/raw_results/.gitkeep
+!results/reports/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
