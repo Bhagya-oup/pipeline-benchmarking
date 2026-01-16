@@ -30,9 +30,6 @@ pip install -r requirements.txt
 
 **Environment Variables** (set in parent project's `.env`):
 ```bash
-SOLR_URL=https://your-solr-url.com/solr
-SOLR_USERNAME=optional
-SOLR_PASSWORD=optional
 HERO_API_KEY=your_hero_api_key
 DEEPSET_API_KEY=your_deepset_api_key
 DEEPSET_WORKSPACE_URL=https://your-workspace.deepset.cloud
