@@ -250,12 +250,8 @@ if __name__ == "__main__":
         parallel_workers=2
     )
 
-    # Create credentials
-    credentials = {
-        'solr_url': os.getenv("SOLR_URL", ""),
-        'sketch_username': os.getenv("SKETCH_ENGINE_USERNAME", ""),
-        'sketch_password': os.getenv("SKETCH_ENGINE_PASSWORD", "")
-    }
+    # Create credentials (not used in current pipeline testing approach)
+    credentials = {}
 
     # Create executors
     new_executor = DeepsetPipelineExecutor(new_config, credentials)

@@ -77,13 +77,16 @@ This document lists all files that should be included in the GitHub repository.
 ### 1. `.env.template`
 Create a template for environment variables:
 ```bash
-# Deepset Cloud API Configuration
+# Required - Deepset Cloud API Configuration
 DEEPSET_API_KEY=your_deepset_api_key_here
-DEEPSET_WORKSPACE_URL=https://your-workspace.deepset.cloud
+DEEPSET_WORKSPACE_URL=https://api.cloud.deepset.ai/api/v1/workspaces/YOUR_WORKSPACE_NAME
 
-# Optional: Additional API Keys
-# HERO_API_KEY=your_hero_api_key
-# SOLR_URL=https://your-solr-instance
+# Optional - Additional API Keys (if your pipelines need them)
+HERO_API_KEY=your_hero_api_key_if_needed
+
+# Note:
+# - DEEPSET_WORKSPACE_URL should be the full API URL, not just the workspace name
+# - Example: https://api.cloud.deepset.ai/api/v1/workspaces/OL-Hero-LM
 ```
 
 ### 2. `README.md`
