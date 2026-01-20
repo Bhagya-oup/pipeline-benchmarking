@@ -87,16 +87,64 @@ class DeepsetPipelineExecutor(PipelineExecutor):
                 # Default Deepset search format
                 # queries: array of query strings
                 # params: nested parameters for pipeline components
-                payload = {
-                    "queries": [test_case.entry_ref],
-                    "params": {
+
+                # Determine parameter format based on pipeline configuration
+                param_format = self.config.param_format
+
+                # Auto-detect format based on pipeline name if set to "auto"
+                if param_format == "auto":
+                    pipeline_lower = self.config.pipeline_name.lower()
+                    if "oed-quotations" in pipeline_lower or "oed_quotations" in pipeline_lower:
+                        param_format = "oed_quotations"
+                    elif "hybrid_prod_ready" in pipeline_lower or "rare_senses_hybrid_prod_ready" in pipeline_lower:
+                        param_format = "hybrid_prod_ready"
+                    else:
+                        param_format = "legacy"  # Default fallback
+
+                # Build params based on format
+                if param_format == "oed_quotations":
+                    # OED Quotations pipeline format:
+                    # - formatter.sense routes to both sense_extractor.sense_id AND formatter.sense
+                    # - quotations.part_of_speech for filtering
+                    params = {
                         "formatter": {
                             "sense": test_case.sense_id
                         },
                         "quotations": {
                             "part_of_speech": test_case.pos
                         }
-                    },
+                    }
+                elif param_format == "hybrid_prod_ready":
+                    # Hybrid Prod Ready pipeline format:
+                    # - sense_extractor.sense_id explicitly
+                    # - formatter.sense explicitly
+                    # - quotations.part_of_speech for filtering
+                    params = {
+                        "sense_extractor": {
+                            "sense_id": test_case.sense_id
+                        },
+                        "formatter": {
+                            "sense": test_case.sense_id
+                        },
+                        "quotations": {
+                            "part_of_speech": test_case.pos
+                        }
+                    }
+                else:
+                    # Legacy format (original implementation)
+                    # - formatter.sense routes to both components
+                    params = {
+                        "formatter": {
+                            "sense": test_case.sense_id
+                        },
+                        "quotations": {
+                            "part_of_speech": test_case.pos
+                        }
+                    }
+
+                payload = {
+                    "queries": [test_case.entry_ref],
+                    "params": params,
                     "debug": False,
                     "view_prompts": False
                 }
@@ -106,6 +154,8 @@ class DeepsetPipelineExecutor(PipelineExecutor):
                 print(f"\n{'='*80}")
                 print(f"DEBUG: First API Request")
                 print(f"{'='*80}")
+                print(f"Pipeline: {self.config.pipeline_name}")
+                print(f"Param Format: {param_format if self.config.input_format != 'simple_query' else 'simple_query'}")
                 print(f"URL: {url}")
                 print(f"Payload: {payload}")
                 print(f"{'='*80}\n")
@@ -126,6 +176,21 @@ class DeepsetPipelineExecutor(PipelineExecutor):
             response.raise_for_status()
 
             result_data = response.json()
+
+            # Check for formatter error in response
+            is_formatter_error = False
+            formatter_error_msg = None
+
+            if 'errors' in result_data and result_data['errors']:
+                error_text = str(result_data['errors'])
+                # Check for specific formatter error patterns
+                if 'number of selections in the JSON does not match' in error_text.lower():
+                    is_formatter_error = True
+                    formatter_error_msg = error_text
+                elif 'int() argument must be a string' in error_text:
+                    # This is also a formatter error (LLM didn't return all quotations)
+                    is_formatter_error = True
+                    formatter_error_msg = error_text
 
             # Extract results from pipeline output
             # The pipeline returns 1 "answer" object containing a JSON array of quotations
@@ -221,6 +286,20 @@ class DeepsetPipelineExecutor(PipelineExecutor):
             metadata['matching_quotations'] = matching_count
             metadata['num_results'] = matching_count  # Use matching count as the main metric
 
+            # Mark formatter errors
+            if is_formatter_error:
+                metadata['error_type'] = 'formatter_error'
+
+            # If formatter error detected, return error result instead
+            if is_formatter_error:
+                return PipelineResult(
+                    test_case=test_case,
+                    pipeline_name=self.config.name,
+                    quotations=[],  # No valid quotations
+                    metadata=metadata,
+                    error=f"FORMATTER_ERROR: {formatter_error_msg[:200]}"
+                )
+
             return PipelineResult(
                 test_case=test_case,
                 pipeline_name=self.config.name,
@@ -231,7 +310,7 @@ class DeepsetPipelineExecutor(PipelineExecutor):
         except requests.exceptions.HTTPError as e:
             elapsed_time = time.time() - start_time
             metadata['response_time'] = elapsed_time
-            metadata['error_type'] = 'HTTPError'
+            metadata['error_type'] = 'http_error'
             metadata['status_code'] = e.response.status_code if hasattr(e, 'response') else None
 
             return PipelineResult(
@@ -239,20 +318,20 @@ class DeepsetPipelineExecutor(PipelineExecutor):
                 pipeline_name=self.config.name,
                 quotations=[],
                 metadata=metadata,
-                error=f"HTTP {e.response.status_code if hasattr(e, 'response') else 'error'}: {str(e)}"
+                error=f"HTTP_ERROR: {e.response.status_code if hasattr(e, 'response') else 'error'}: {str(e)}"
             )
 
         except Exception as e:
             elapsed_time = time.time() - start_time
             metadata['response_time'] = elapsed_time
-            metadata['error_type'] = type(e).__name__
+            metadata['error_type'] = 'pipeline_error'
 
             return PipelineResult(
                 test_case=test_case,
                 pipeline_name=self.config.name,
                 quotations=[],
                 metadata=metadata,
-                error=str(e)
+                error=f"PIPELINE_ERROR: {str(e)}"
             )
 
 

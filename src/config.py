@@ -17,6 +17,7 @@ class PipelineConfig:
     timeout: int = 120                 # API timeout in seconds
     input_format: str = "deepset_search"  # "deepset_search" or "simple_query"
     endpoint: str = "search"           # "search" or "run"
+    param_format: str = "auto"         # "auto", "oed_quotations", "hybrid_prod_ready", or "legacy"
 
 
 @dataclass

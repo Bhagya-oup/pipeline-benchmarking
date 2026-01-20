@@ -217,23 +217,55 @@ def main():
 
     print()
     print("="*80)
-    print("SUMMARY STATISTICS")
+    print("🎯 KEY RESULTS")
     print("="*80)
 
-    # Quick summary
-    total_quotations = sum(r.metadata.get('total_quotations', 0) for r in results)
-    total_matching = sum(r.metadata.get('matching_quotations', 0) for r in results)
-    total_errors = sum(1 for r in results if r.error)
+    # Separate formatter errors from other errors
+    formatter_errors = [r for r in results if r.metadata.get('error_type') == 'formatter_error']
+    other_errors = [r for r in results if r.error and r.metadata.get('error_type') != 'formatter_error']
+    valid_results = [r for r in results if not r.error]
 
-    print(f"Total test cases: {len(results)}")
-    print(f"Total quotations returned: {total_quotations}")
-    print(f"Total matching quotations: {total_matching}")
-    if total_quotations > 0:
-        print(f"Match rate: {total_matching/total_quotations*100:.1f}%")
-    print(f"Errors: {total_errors}")
+    # Calculate stats excluding formatter errors
+    total_quotations = sum(r.metadata.get('total_quotations', 0) for r in valid_results)
+    total_matching = sum(r.metadata.get('matching_quotations', 0) for r in valid_results)
+
+    # Calculate zero matches
+    zero_matches = sum(1 for r in valid_results if r.metadata.get('matching_quotations', 0) == 0)
+
+    # Calculate variance
+    import numpy as np
+    matches_per_case = [r.metadata.get('matching_quotations', 0) for r in valid_results]
+    std_matches = np.std(matches_per_case, ddof=1) if len(matches_per_case) > 1 else 0
+    avg_matches = np.mean(matches_per_case) if matches_per_case else 0
+    cv = (std_matches / avg_matches * 100) if avg_matches > 0 else 0
+
+    if len(valid_results) > 0:
+        avg_quotations = total_quotations/len(valid_results)
+        avg_match_rate = (avg_matches/avg_quotations*100) if avg_quotations > 0 else 0
+
+        print()
+        print(f"1️⃣  Average Match Rate per Case: {avg_matches:.2f} out of {avg_quotations:.1f} ({avg_match_rate:.1f}%)")
+        print(f"   → On average, {avg_matches:.1f} quotations matched out of {avg_quotations:.0f}")
+        print()
+
+        zero_pct = (zero_matches/len(valid_results)*100)
+        status_emoji = "🔴" if zero_pct > 50 else "🟡" if zero_pct > 30 else "🟢"
+        print(f"2️⃣  Zero Match Cases: {status_emoji} {zero_matches}/{len(valid_results)} ({zero_pct:.1f}%)")
+        print(f"   → {zero_matches} test cases found no matching quotations")
+        print()
+
+        cv_status_emoji = "🟢" if cv < 80 else "🟡" if cv < 120 else "🔴"
+        print(f"3️⃣  Consistency: {cv_status_emoji} CV = {cv:.1f}% (Std Dev: {std_matches:.2f})")
+        print(f"   → {'Excellent' if cv < 80 else 'Good' if cv < 120 else 'Variable'} consistency")
+
     print()
-    print(f"Average quotations per test case: {total_quotations/len(results):.1f}")
-    print(f"Average matches per test case: {total_matching/len(results):.1f}")
+    print("="*80)
+    print("📊 DETAILED STATISTICS")
+    print("="*80)
+    print(f"Total test cases: {len(results)}")
+    print(f"Valid cases: {len(valid_results)}")
+    print(f"Formatter errors: {len(formatter_errors)}")
+    print(f"Pipeline errors: {len(other_errors)}")
 
     print()
     print("="*80)

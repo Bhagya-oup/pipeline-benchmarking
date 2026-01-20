@@ -18,6 +18,7 @@ This tool benchmarks a Deepset Cloud pipeline across multiple test cases, measur
 ✅ **Real API Testing**: Tests against actual Deepset Cloud pipeline APIs (~42-52 seconds per test case)
 ✅ **Error Handling**: Automatic retry with exponential backoff
 ✅ **Rate Limiting**: Prevents exceeding API quotas
+✅ **Multiple Parameter Formats**: Automatically adapts to different pipeline input structures (see [PARAMETER_FORMATS.md](PARAMETER_FORMATS.md))
 
 ## Installation
 
